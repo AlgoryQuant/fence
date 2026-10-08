@@ -1,0 +1,10 @@
+diff --git a/src/fence.py b/src/fence.py
+--- a/src/fence.py
++++ b/src/fence.py
+@@ -0,0 +1 @@
++changed
+diff --git a/tests/test_fence.py b/tests/test_fence.py
+--- a/tests/test_fence.py
++++ b/tests/test_fence.py
+@@ -0,0 +1 @@
++changed
