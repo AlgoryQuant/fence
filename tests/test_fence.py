@@ -36,6 +36,12 @@ def test_a_card_without_a_forbid_line_does_not_allow_every_path():
     )
 
 
+def test_report_counts_every_locked_case():
+    count, mismatches = fence.report(ROOT)
+    assert count == 6
+    assert mismatches == []
+
+
 def test_cli_exits_zero_for_the_ok_sample():
     code = fence.main(
         [

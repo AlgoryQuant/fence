@@ -24,4 +24,12 @@ On macOS or Linux, use `python3 -m venv .venv` and `./.venv/bin/python -m pytest
 
 The first command exits 0. The second prints `README.md` and exits 1.
 
+The score has a denominator:
+
+```powershell
+.\.venv\Scripts\python src\fence.py report
+```
+
+That prints `cases 6`, `passed 6`, `failed 0`. `incidents/001.md` is the real hole in the first commit: `src/../README.md` was allowed until the path was collapsed. `docs/REVIEW.md` is the verdict on the diff that tries to erase the forbid line.
+
 CI runs the same tests on every push.

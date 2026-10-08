@@ -81,14 +81,47 @@ def check(card_text: str, diff_text: str) -> str | None:
     return None
 
 
+# The denominator. Expected None means the diff is accepted.
+CASES: tuple[tuple[str, str | None], ...] = (
+    ("samples/ok.diff", None),
+    ("samples/bad.diff", "README.md"),
+    ("samples/cards.diff", "cards/implement.md"),
+    ("samples/escape.diff", "src/../README.md"),
+    ("samples/outside.diff", "../secrets.env"),
+    ("samples/empty.diff", "diff has no files"),
+)
+
+
+def report(root: Path) -> tuple[int, list[str]]:
+    """Run every locked case. Return (count, mismatch lines)."""
+    card = (root / "cards" / "implement.md").read_text(encoding="utf-8")
+    mismatches: list[str] = []
+    for name, expected in CASES:
+        got = check(card, (root / name).read_text(encoding="utf-8"))
+        if got != expected:
+            mismatches.append(f"{name}: expected {expected!r}, got {got!r}")
+    return len(CASES), mismatches
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Check a diff against an agent card.")
-    parser.add_argument("check_cmd", nargs="?", default="check")
-    parser.add_argument("--card", required=True)
-    parser.add_argument("--diff", required=True)
+    parser.add_argument("command", nargs="?", default="check")
+    parser.add_argument("--card")
+    parser.add_argument("--diff")
     args = parser.parse_args(argv)
-    if args.check_cmd != "check":
+    if args.command == "report":
+        count, mismatches = report(Path(__file__).resolve().parents[1])
+        print(f"cases {count}")
+        print(f"passed {count - len(mismatches)}")
+        print(f"failed {len(mismatches)}")
+        for line in mismatches:
+            print(line)
+        return 1 if mismatches else 0
+    if args.command != "check":
         print("unknown command", file=sys.stderr)
+        return 2
+    if not args.card or not args.diff:
+        print("check needs --card and --diff", file=sys.stderr)
         return 2
     problem = check(Path(args.card).read_text(encoding="utf-8"), Path(args.diff).read_text(encoding="utf-8"))
     if problem:
