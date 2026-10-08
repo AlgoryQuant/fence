@@ -30,14 +30,37 @@ def changed_files(diff_text: str) -> list[str]:
     return files
 
 
+def normalize(path: str) -> str:
+    """Collapse '.' and '..' so a write cannot hide behind a prefix."""
+    raw = path.replace("\\", "/").strip()
+    while raw.startswith("./"):
+        raw = raw[2:]
+    if raw.startswith("/") or (len(raw) >= 2 and raw[1] == ":"):
+        return raw
+    parts: list[str] = []
+    for part in raw.split("/"):
+        if part in ("", "."):
+            continue
+        if part == "..":
+            if parts and parts[-1] != "..":
+                parts.pop()
+            else:
+                parts.append("..")
+        else:
+            parts.append(part)
+    return "/".join(parts)
+
+
 def is_forbidden(path: str, entries: list[str]) -> bool:
-    normal = path.replace("\\", "/").lstrip("./")
+    normal = normalize(path)
+    if not normal or normal.startswith("..") or normal.startswith("/") or (len(normal) >= 2 and normal[1] == ":"):
+        return True
     for entry in entries:
-        rule = entry.replace("\\", "/").strip()
+        rule = normalize(entry.replace("\\", "/").strip())
         if not rule:
             continue
-        if rule.endswith("/"):
-            if normal.startswith(rule):
+        if entry.replace("\\", "/").strip().endswith("/"):
+            if normal == rule or normal.startswith(rule + "/"):
                 return True
         elif normal == rule:
             return True

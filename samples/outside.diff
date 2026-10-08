@@ -1,0 +1,5 @@
+diff --git a/../secrets.env b/../secrets.env
+--- a/../secrets.env
++++ b/../secrets.env
+@@ -0,0 +1 @@
++TOKEN=secret

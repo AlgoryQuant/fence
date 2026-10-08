@@ -1,0 +1,6 @@
+diff --git a/cards/implement.md b/cards/implement.md
+--- a/cards/implement.md
++++ b/cards/implement.md
+@@ -1 +1 @@
+-May not write: cards/, README.md, AGENTS.md, incidents/.
++May not write:
